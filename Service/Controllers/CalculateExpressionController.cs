@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServiceCalculator.Models;
+using System.Diagnostics;
 
 namespace ServiceCalculator.Controllers
 {
@@ -24,6 +25,17 @@ namespace ServiceCalculator.Controllers
             public String? Result { get; set; }
         }
 
+        private string calculate(string expression)
+        {
+            string cwd = Directory.GetCurrentDirectory();
+            Directory.SetCurrentDirectory("..");
+            System.IO.File.WriteAllText("input.txt", expression);
+            Process.Start("Parser.exe").WaitForExit();
+            string result = System.IO.File.ReadAllText("output.txt").Trim();
+            Directory.SetCurrentDirectory(cwd);
+            return result;
+        }
+
         [HttpPost]
         public async Task<ActionResult<Res>> PostExpAndResItem(Exp InputExp)
         {
@@ -31,7 +43,7 @@ namespace ServiceCalculator.Controllers
 
             //
 
-            OutputResult.Result = InputExp.Expression; // заменить на вычисление
+            OutputResult.Result = calculate(InputExp.Expression); // заменить на вычисление
 
             //
 
